@@ -69,6 +69,12 @@ $ cargo install --locked lpx
 $ brew install lusingander/tap/lpx
 ```
 
+### [AUR](https://aur.archlinux.org/packages/lpx)
+
+```
+$ paru -S lpx
+```
+
 ### Downloading binary
 
 You can download pre-compiled binaries from [releases](https://github.com/lusingander/lpx/releases).
