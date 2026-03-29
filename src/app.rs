@@ -467,7 +467,7 @@ fn calc_scaled_image_area_and_dimensions(
 ) -> ScaledImageArea {
     // note: assume that the width-to-height ratio of the cell (font) is 1:2.
     let scale_w = (area.width as f32) / (image_width as f32);
-    let scale_h = ((area.height as f32) * 2.0) / (image_height as f32);
+    let scale_h = ((area.height as f32) / 0.5) / (image_height as f32);
     let scale = scale_w.min(scale_h);
     let w = (image_width as f32 * scale).floor() as u32;
     let h = ((image_height as f32 * scale) / 2.0).floor() as u32;
