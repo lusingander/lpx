@@ -479,6 +479,7 @@ fn calc_scaled_image_area_and_dimensions(
     ScaledImageArea { l, t, r, b, w, h }
 }
 
+#[derive(Debug, PartialEq, Eq)]
 struct ScaledImageArea {
     l: u16,
     t: u16,
@@ -486,4 +487,26 @@ struct ScaledImageArea {
     b: u16,
     w: u32,
     h: u32,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use ratatui::layout::Rect;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case(Rect::new(0, 0, 10, 5), (100, 100), ScaledImageArea { l: 0, t: 0, r: 10, b: 5, w: 10, h: 5 })]
+    #[case(Rect::new(0, 0, 10, 5), (200, 100), ScaledImageArea { l: 0, t: 0, r: 10, b: 2, w: 10, h: 2 })]
+    #[case(Rect::new(0, 0, 10, 5), (100, 200), ScaledImageArea { l: 2, t: 0, r: 7, b: 5, w: 5, h: 5 })]
+    #[case(Rect::new(0, 0, 10, 5), (50, 50), ScaledImageArea { l: 0, t: 0, r: 10, b: 5, w: 10, h: 5 })]
+    fn test_calc_scaled_image_area_and_dimensions(
+        #[case] area: Rect,
+        #[case] (image_width, image_height): (u32, u32),
+        #[case] expected: ScaledImageArea,
+    ) {
+        let scaled_area = calc_scaled_image_area_and_dimensions(area, image_width, image_height);
+        assert_eq!(scaled_area, expected);
+    }
 }
