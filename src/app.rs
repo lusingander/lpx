@@ -329,27 +329,20 @@ impl App {
     }
 
     fn render_image(&self, buf: &mut Buffer, area: Rect) {
-        // note: assume that the width-to-height ratio of the cell (font) is 1:2.
-        let scale_w = (area.width as f32) / (self.images.width() as f32);
-        let scale_h = ((area.height as f32) * 2.0) / (self.images.height() as f32);
-        let scale = scale_w.min(scale_h);
-        let width = (self.images.width() as f32 * scale).floor() as u32;
-        let height = ((self.images.height() as f32 * scale) / 2.0).floor() as u32;
+        let ScaledImageArea { l, t, r, b, w, h } =
+            calc_scaled_image_area_and_dimensions(area, self.images.width(), self.images.height());
 
-        let (l, t) = (area.left() + ((area.width - width as u16) / 2), area.top());
-        let (r, b) = (l + width as u16, t + height as u16);
-        buf[(l, t)].set_symbol(&self.images.get(self.current_frame).protocol_encoded(
-            self.protocol,
-            width,
-            height,
-        ));
+        let image = self.images.get(self.current_frame);
+        let encoded = image.protocol_encoded(self.protocol, w, h);
 
-        for w in l..r {
-            for h in t..b {
-                if w == l && h == t {
+        buf[(l, t)].set_symbol(&encoded);
+
+        for col in l..r {
+            for row in t..b {
+                if col == l && row == t {
                     continue;
                 }
-                buf[(w, h)].set_skip(true);
+                buf[(col, row)].set_skip(true);
             }
         }
     }
@@ -465,4 +458,32 @@ impl App {
         ]);
         detail.render(area, buf);
     }
+}
+
+fn calc_scaled_image_area_and_dimensions(
+    area: Rect,
+    image_width: u32,
+    image_height: u32,
+) -> ScaledImageArea {
+    // note: assume that the width-to-height ratio of the cell (font) is 1:2.
+    let scale_w = (area.width as f32) / (image_width as f32);
+    let scale_h = ((area.height as f32) * 2.0) / (image_height as f32);
+    let scale = scale_w.min(scale_h);
+    let w = (image_width as f32 * scale).floor() as u32;
+    let h = ((image_height as f32 * scale) / 2.0).floor() as u32;
+
+    let l = area.left() + ((area.width - w as u16) / 2);
+    let t = area.top();
+    let r = l + w as u16;
+    let b = t + h as u16;
+    ScaledImageArea { l, t, r, b, w, h }
+}
+
+struct ScaledImageArea {
+    l: u16,
+    t: u16,
+    r: u16,
+    b: u16,
+    w: u32,
+    h: u32,
 }
