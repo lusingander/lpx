@@ -26,3 +26,6 @@ ratatui = "0.30.0"
 rayon = "1.11.0"
 smart-default = "0.7.1"
 unicode-width = "0.2.2"
+
+[dev-dependencies]
+rstest = "0.26.1"
